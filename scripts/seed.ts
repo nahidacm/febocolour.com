@@ -2,6 +2,7 @@ import "@/scripts/load-env";
 
 import { db } from "@/lib/db/client";
 import {
+  adminUsers,
   attributes,
   attributeValues,
   categories,
@@ -11,16 +12,25 @@ import {
   productVariants,
   productVariantValues,
   products,
+  reviews,
   shippingMethodConfigs,
 } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
+import { hashPassword } from "@/lib/auth/password";
 
 async function truncateAll() {
   await db.execute(sql`
     TRUNCATE TABLE
+      audit_logs,
+      admin_sessions,
+      admin_users,
+      customer_sessions,
+      addresses,
+      reviews,
       order_payment_details,
       order_items,
       orders,
+      customers,
       cart_items,
       carts,
       product_variant_values,
@@ -322,9 +332,12 @@ async function main() {
     },
   ];
 
+  const insertedProductsBySlug = new Map<string, { id: number }>();
+
   for (const seedProduct of seedProducts) {
     const { variantAttributes, ...productData } = seedProduct;
     const [product] = await db.insert(products).values(productData).returning();
+    insertedProductsBySlug.set(product.slug, product);
 
     if (!variantAttributes || variantAttributes.length === 0) continue;
 
@@ -445,7 +458,50 @@ async function main() {
     },
   ]);
 
+  // ---- Admin user ------------------------------------------------------------
+  const adminEmail = "admin@febocolour.com";
+  const adminPassword = "FeboAdmin123!";
+  await db.insert(adminUsers).values({
+    email: adminEmail,
+    passwordHash: await hashPassword(adminPassword),
+    fullName: "Store Admin",
+    role: "super_admin",
+  });
+
+  // ---- Sample reviews (for admin moderation demo) --------------------------
+  const chiffonHijab = insertedProductsBySlug.get("premium-chiffon-hijab");
+  const classicAbaya = insertedProductsBySlug.get("classic-abaya");
+  if (chiffonHijab && classicAbaya) {
+    await db.insert(reviews).values([
+      {
+        productId: chiffonHijab.id,
+        guestName: "Sumaiya R.",
+        rating: 5,
+        title: "So soft and comfortable",
+        body: "The fabric quality is amazing and it doesn't slip. Highly recommend!",
+        isApproved: true,
+      },
+      {
+        productId: classicAbaya.id,
+        guestName: "Nusrat J.",
+        rating: 5,
+        title: "Perfect fit",
+        body: "Exactly like the pictures, fast delivery too.",
+        isApproved: true,
+      },
+      {
+        productId: chiffonHijab.id,
+        guestName: "Farzana A.",
+        rating: 4,
+        title: "Pending review",
+        body: "Nice color, waiting to see how it holds up after a few washes.",
+        isApproved: false,
+      },
+    ]);
+  }
+
   console.log(`Seeded ${seedProducts.length} products across categories.`);
+  console.log(`Admin login: ${adminEmail} / ${adminPassword}`);
   process.exit(0);
 }
 
