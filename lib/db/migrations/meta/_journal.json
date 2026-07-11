@@ -29,6 +29,13 @@
       "when": 1783777485335,
       "tag": "0003_eager_stone_men",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783779363497,
+      "tag": "0004_chief_leader",
+      "breakpoints": true
     }
   ]
 }

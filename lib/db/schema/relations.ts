@@ -11,6 +11,9 @@ import {
 import { cartItems, carts } from "@/lib/db/schema/cart";
 import { orderItems, orderPaymentDetails, orders } from "@/lib/db/schema/orders";
 import { paymentMethodConfigs, shippingMethodConfigs } from "@/lib/db/schema/config";
+import { addresses, adminSessions, adminUsers, customerSessions, customers } from "@/lib/db/schema/auth";
+import { reviews } from "@/lib/db/schema/reviews";
+import { auditLogs } from "@/lib/db/schema/audit";
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
   parent: one(categories, {
@@ -31,6 +34,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   videos: many(productVideos),
   productAttributes: many(productAttributes),
   variants: many(productVariants),
+  reviews: many(reviews),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -94,8 +98,12 @@ export const productVariantValuesRelations = relations(productVariantValues, ({ 
   }),
 }));
 
-export const cartsRelations = relations(carts, ({ many }) => ({
+export const cartsRelations = relations(carts, ({ one, many }) => ({
   items: many(cartItems),
+  customer: one(customers, {
+    fields: [carts.customerId],
+    references: [customers.id],
+  }),
 }));
 
 export const cartItemsRelations = relations(cartItems, ({ one }) => ({
@@ -130,8 +138,64 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
     fields: [orders.paymentMethodId],
     references: [paymentMethodConfigs.id],
   }),
+  customer: one(customers, {
+    fields: [orders.customerId],
+    references: [customers.id],
+  }),
   items: many(orderItems),
   paymentDetails: many(orderPaymentDetails),
+}));
+
+export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
+  sessions: many(adminSessions),
+  auditLogs: many(auditLogs),
+}));
+
+export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
+  adminUser: one(adminUsers, {
+    fields: [adminSessions.adminUserId],
+    references: [adminUsers.id],
+  }),
+}));
+
+export const customersRelations = relations(customers, ({ many }) => ({
+  sessions: many(customerSessions),
+  addresses: many(addresses),
+  orders: many(orders),
+  reviews: many(reviews),
+  carts: many(carts),
+}));
+
+export const customerSessionsRelations = relations(customerSessions, ({ one }) => ({
+  customer: one(customers, {
+    fields: [customerSessions.customerId],
+    references: [customers.id],
+  }),
+}));
+
+export const addressesRelations = relations(addresses, ({ one }) => ({
+  customer: one(customers, {
+    fields: [addresses.customerId],
+    references: [customers.id],
+  }),
+}));
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  product: one(products, {
+    fields: [reviews.productId],
+    references: [products.id],
+  }),
+  customer: one(customers, {
+    fields: [reviews.customerId],
+    references: [customers.id],
+  }),
+}));
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  adminUser: one(adminUsers, {
+    fields: [auditLogs.adminUserId],
+    references: [adminUsers.id],
+  }),
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({

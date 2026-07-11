@@ -12,10 +12,12 @@ import { products } from "@/lib/db/schema/products";
 import { productVariants } from "@/lib/db/schema/attributes";
 import { paymentMethodConfigs, shippingMethodConfigs } from "@/lib/db/schema/config";
 import { orderStatusEnum, paymentStatusEnum } from "@/lib/db/schema/enums";
+import { customers } from "@/lib/db/schema/auth";
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   orderNumber: varchar("order_number", { length: 40 }).notNull().unique(),
+  customerId: integer("customer_id").references(() => customers.id, { onDelete: "set null" }),
   shippingFullName: varchar("shipping_full_name", { length: 150 }).notNull(),
   shippingPhone: varchar("shipping_phone", { length: 30 }).notNull(),
   email: varchar("email", { length: 255 }),
