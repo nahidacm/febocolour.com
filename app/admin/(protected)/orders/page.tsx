@@ -1,50 +1,65 @@
+import Link from "next/link";
+import { Table, Th, Td } from "@/components/admin/Table";
 import { getAllOrders } from "@/lib/services/orders";
 
 export const dynamic = "force-dynamic";
 
-// Bare, unauthenticated read-only view — just enough to confirm Phase 2 orders land
-// correctly in the DB. Phase 3 replaces this with the real admin_users-guarded layout.
+const statusColors: Record<string, string> = {
+  pending: "bg-amber-50 text-amber-700",
+  processing: "bg-blue-50 text-blue-700",
+  shipped: "bg-indigo-50 text-indigo-700",
+  delivered: "bg-green-50 text-green-700",
+  cancelled: "bg-red-50 text-red-700",
+  returned: "bg-foreground/10 text-foreground/60",
+};
+
 export default async function AdminOrdersPage() {
-  const allOrders = await getAllOrders();
+  const items = await getAllOrders();
 
   return (
-    <div style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
-      <h1 style={{ fontSize: 20, fontWeight: 600 }}>Orders ({allOrders.length})</h1>
-      <table style={{ marginTop: 16, borderCollapse: "collapse", width: "100%", fontSize: 14 }}>
-        <thead>
-          <tr style={{ textAlign: "left", borderBottom: "2px solid #eee" }}>
-            <th style={{ padding: "8px 12px" }}>Order #</th>
-            <th style={{ padding: "8px 12px" }}>Customer</th>
-            <th style={{ padding: "8px 12px" }}>Phone</th>
-            <th style={{ padding: "8px 12px" }}>Items</th>
-            <th style={{ padding: "8px 12px" }}>Shipping</th>
-            <th style={{ padding: "8px 12px" }}>Payment</th>
-            <th style={{ padding: "8px 12px" }}>Total</th>
-            <th style={{ padding: "8px 12px" }}>Status</th>
-            <th style={{ padding: "8px 12px" }}>Placed</th>
-          </tr>
-        </thead>
-        <tbody>
-          {allOrders.map((order) => (
-            <tr key={order.id} style={{ borderBottom: "1px solid #eee" }}>
-              <td style={{ padding: "8px 12px", fontWeight: 600 }}>{order.orderNumber}</td>
-              <td style={{ padding: "8px 12px" }}>{order.shippingFullName}</td>
-              <td style={{ padding: "8px 12px" }}>{order.shippingPhone}</td>
-              <td style={{ padding: "8px 12px" }}>
-                {order.items.map((i) => `${i.productNameSnapshot} x${i.quantity}`).join(", ")}
-              </td>
-              <td style={{ padding: "8px 12px" }}>{order.shippingMethod.name}</td>
-              <td style={{ padding: "8px 12px" }}>{order.paymentMethod.name}</td>
-              <td style={{ padding: "8px 12px" }}>৳{Number(order.total).toLocaleString("en-US")}</td>
-              <td style={{ padding: "8px 12px" }}>
-                {order.orderStatus} / {order.paymentStatus}
-              </td>
-              <td style={{ padding: "8px 12px" }}>{new Date(order.placedAt).toLocaleString()}</td>
+    <div>
+      <h1 className="font-display text-2xl font-semibold text-foreground">Orders ({items.length})</h1>
+
+      <div className="mt-6">
+        <Table>
+          <thead>
+            <tr>
+              <Th>Order #</Th>
+              <Th>Customer</Th>
+              <Th>Shipping</Th>
+              <Th>Payment</Th>
+              <Th>Total</Th>
+              <Th>Status</Th>
+              <Th>Placed</Th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {allOrders.length === 0 ? <p style={{ marginTop: 16 }}>No orders yet.</p> : null}
+          </thead>
+          <tbody>
+            {items.map((order) => (
+              <tr key={order.id}>
+                <Td>
+                  <Link href={`/admin/orders/${order.id}`} className="font-medium hover:text-brand-700">
+                    {order.orderNumber}
+                  </Link>
+                </Td>
+                <Td>
+                  {order.shippingFullName}
+                  <p className="text-xs text-foreground/50">{order.shippingPhone}</p>
+                </Td>
+                <Td className="text-foreground/60">{order.shippingMethod.name}</Td>
+                <Td className="text-foreground/60">{order.paymentMethod.name}</Td>
+                <Td>৳{Number(order.total).toLocaleString("en-US")}</Td>
+                <Td>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[order.orderStatus] ?? ""}`}>
+                    {order.orderStatus}
+                  </span>
+                </Td>
+                <Td className="text-foreground/60">{new Date(order.placedAt).toLocaleDateString()}</Td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        {items.length === 0 ? <p className="mt-4 text-sm text-foreground/60">No orders yet.</p> : null}
+      </div>
     </div>
   );
 }

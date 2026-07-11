@@ -1,0 +1,42 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/auth/guards";
+import { writeAuditLog } from "@/lib/audit";
+import { orderStatusUpdateSchema } from "@/lib/validation/admin/order";
+import { getOrderForAdmin, updateOrderStatus } from "@/lib/services/orders";
+
+export type OrderStatusFormState = { error?: string; success?: boolean };
+
+export async function updateOrderStatusAction(
+  _prevState: OrderStatusFormState,
+  formData: FormData,
+): Promise<OrderStatusFormState> {
+  const admin = await requireAdmin();
+  const id = Number(formData.get("id"));
+
+  const parsed = orderStatusUpdateSchema.safeParse({
+    orderStatus: formData.get("orderStatus")?.toString(),
+    paymentStatus: formData.get("paymentStatus")?.toString(),
+  });
+  if (!parsed.success) return { error: "Invalid status selected." };
+
+  const before = await getOrderForAdmin(id);
+  await updateOrderStatus(id, parsed.data);
+
+  await writeAuditLog({
+    adminUserId: admin.id,
+    action: "update_status",
+    entityType: "order",
+    entityId: id,
+    changes: {
+      orderStatus: { from: before?.orderStatus, to: parsed.data.orderStatus },
+      paymentStatus: { from: before?.paymentStatus, to: parsed.data.paymentStatus },
+    },
+  });
+
+  revalidatePath(`/admin/orders/${id}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+  return { success: true };
+}
