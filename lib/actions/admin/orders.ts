@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/guards";
 import { writeAuditLog } from "@/lib/audit";
 import { orderStatusUpdateSchema } from "@/lib/validation/admin/order";
-import { getOrderForAdmin, updateOrderStatus, verifyOrderPayment } from "@/lib/services/orders";
+import {
+  getOrderForAdmin,
+  refreshSteadfastStatus,
+  sendOrderToSteadfast,
+  updateOrderStatus,
+  verifyOrderPayment,
+} from "@/lib/services/orders";
 
 export type OrderStatusFormState = { error?: string; success?: boolean };
 
@@ -58,4 +64,35 @@ export async function verifyOrderPaymentAction(orderPaymentDetailId: number, ord
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
+}
+
+export async function sendOrderToSteadfastAction(orderId: number): Promise<{ error?: string }> {
+  const admin = await requireAdmin();
+  const result = await sendOrderToSteadfast(orderId);
+
+  if (result.success) {
+    await writeAuditLog({
+      adminUserId: admin.id,
+      action: "send_to_courier",
+      entityType: "order",
+      entityId: orderId,
+      changes: { courier: "steadfast", trackingCode: result.data.trackingCode },
+    });
+    revalidatePath(`/admin/orders/${orderId}`);
+    return {};
+  }
+
+  return { error: result.error };
+}
+
+export async function refreshSteadfastStatusAction(orderId: number): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await refreshSteadfastStatus(orderId);
+
+  if (result.success) {
+    revalidatePath(`/admin/orders/${orderId}`);
+    return {};
+  }
+
+  return { error: result.error };
 }

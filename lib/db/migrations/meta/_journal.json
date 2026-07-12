@@ -43,6 +43,20 @@
       "when": 1783825708442,
       "tag": "0005_phase5_lockout_and_payment_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783829530809,
+      "tag": "0006_phase6_steadfast_courier",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783830377171,
+      "tag": "0007_phase6_courier_tracking_link",
+      "breakpoints": true
     }
   ]
 }

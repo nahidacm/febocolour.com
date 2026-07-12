@@ -40,6 +40,16 @@ export const orders = pgTable("orders", {
   couponCode: varchar("coupon_code", { length: 40 }),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   currency: char("currency", { length: 3 }).notNull().default("BDT"),
+  // Steadfast Courier — set once an admin pushes this order for delivery (Phase 6).
+  // courierConsignmentId is Steadfast's internal id, used for status lookups;
+  // courierTrackingCode is the customer-facing code; courierTrackingLink is their
+  // public tracking page URL; courierStatus is the last delivery_status pulled
+  // from their API.
+  courierConsignmentId: varchar("courier_consignment_id", { length: 40 }),
+  courierTrackingCode: varchar("courier_tracking_code", { length: 60 }),
+  courierTrackingLink: varchar("courier_tracking_link", { length: 255 }),
+  courierStatus: varchar("courier_status", { length: 40 }),
+  courierSentAt: timestamp("courier_sent_at", { withTimezone: true }),
   placedAt: timestamp("placed_at", { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { OrderStatusForm } from "@/components/admin/orders/OrderStatusForm";
 import { VerifyPaymentButton } from "@/components/admin/orders/VerifyPaymentButton";
+import { SteadfastPanel } from "@/components/admin/orders/SteadfastPanel";
 import { verifyOrderPaymentAction } from "@/lib/actions/admin/orders";
 import { getOrderForAdmin } from "@/lib/services/orders";
 
@@ -90,6 +91,16 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <SteadfastPanel
+          orderId={order.id}
+          courierTrackingCode={order.courierTrackingCode}
+          courierTrackingLink={order.courierTrackingLink}
+          courierStatus={order.courierStatus}
+          courierSentAt={order.courierSentAt}
+        />
       </div>
 
       <div className="mt-6 rounded-brand-lg border border-brand-100 bg-white p-6">
