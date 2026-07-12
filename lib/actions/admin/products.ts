@@ -16,14 +16,22 @@ import {
   updateProduct,
   type VariantRowInput,
 } from "@/lib/services/admin/products";
+import { getCategoryForAdmin } from "@/lib/services/admin/categories";
 import { deleteFile, saveFile } from "@/lib/storage/local";
 
 export type ProductFormState = { error?: string; fieldErrors?: Record<string, string> };
 
-function revalidateStorefront(slug?: string) {
+// Category listing pages are ISR (5 min window) — bust them on write so a product
+// that's added, removed, or moved between categories shows up immediately instead
+// of waiting out the window. Pass both the old and new category slug on updates,
+// since a product can move from one category to another.
+function revalidateStorefront(slug?: string, categorySlugs: Array<string | undefined | null> = []) {
   revalidatePath("/");
   revalidatePath("/search");
   if (slug) revalidatePath(`/product/${slug}`);
+  for (const catSlug of new Set(categorySlugs.filter((s): s is string => !!s))) {
+    revalidatePath(`/category/${catSlug}`);
+  }
 }
 
 export async function saveProductAction(
@@ -69,7 +77,9 @@ export async function saveProductAction(
 
   try {
     if (id) {
+      const existing = await getProductForAdmin(id);
       const product = await updateProduct(id, parsed.data, badges);
+      const newCategory = product.categoryId ? await getCategoryForAdmin(product.categoryId) : null;
       await writeAuditLog({
         adminUserId: admin.id,
         action: "update",
@@ -77,13 +87,14 @@ export async function saveProductAction(
         entityId: id,
         changes: { name: product.name, slug: product.slug },
       });
-      revalidateStorefront(product.slug);
+      revalidateStorefront(product.slug, [existing?.category?.slug, newCategory?.slug]);
       revalidatePath(`/admin/products/${id}`);
       revalidatePath("/admin/products");
       return {};
     }
 
     const product = await createProduct(parsed.data, badges);
+    const category = product.categoryId ? await getCategoryForAdmin(product.categoryId) : null;
     await writeAuditLog({
       adminUserId: admin.id,
       action: "create",
@@ -91,7 +102,7 @@ export async function saveProductAction(
       entityId: product.id,
       changes: { name: product.name, slug: product.slug },
     });
-    revalidateStorefront(product.slug);
+    revalidateStorefront(product.slug, [category?.slug]);
     revalidatePath("/admin/products");
     redirect(`/admin/products/${product.id}`);
   } catch (err) {
@@ -115,7 +126,7 @@ export async function deleteProductAction(id: number) {
     entityId: id,
     changes: product ? { name: product.name, slug: product.slug } : undefined,
   });
-  revalidateStorefront(product?.slug);
+  revalidateStorefront(product?.slug, [product?.category?.slug]);
   revalidatePath("/admin/products");
 }
 
@@ -140,7 +151,7 @@ export async function uploadProductImageAction(productId: number, formData: Form
     changes: { count: files.length },
   });
 
-  revalidateStorefront(existing?.slug);
+  revalidateStorefront(existing?.slug, [existing?.category?.slug]);
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -151,6 +162,7 @@ export async function deleteProductImageAction(imageId: number, productId: numbe
     await deleteProductImage(imageId);
     await deleteFile(image.storageKey);
   }
+  const product = await getProductForAdmin(productId);
   await writeAuditLog({
     adminUserId: admin.id,
     action: "delete_image",
@@ -158,7 +170,7 @@ export async function deleteProductImageAction(imageId: number, productId: numbe
     entityId: productId,
   });
   revalidatePath(`/admin/products/${productId}`);
-  revalidateStorefront();
+  revalidateStorefront(product?.slug, [product?.category?.slug]);
 }
 
 export async function saveProductVariantsAction({
@@ -180,6 +192,6 @@ export async function saveProductVariantsAction({
     entityId: productId,
     changes: { variantCount: variants.length },
   });
-  revalidateStorefront(product?.slug);
+  revalidateStorefront(product?.slug, [product?.category?.slug]);
   revalidatePath(`/admin/products/${productId}`);
 }

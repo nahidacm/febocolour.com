@@ -21,6 +21,7 @@ export async function getProductForAdmin(id: number) {
   return db.query.products.findFirst({
     where: eq(products.id, id),
     with: {
+      category: true,
       images: { orderBy: asc(productImages.sortOrder) },
       productAttributes: { orderBy: asc(productAttributes.sortOrder), with: { attribute: true } },
       variants: { with: { variantValues: { with: { attributeValue: true } } } },
