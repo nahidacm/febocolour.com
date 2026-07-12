@@ -33,6 +33,8 @@ export async function placeOrderAction(
     notes: formData.get("notes")?.toString() ?? "",
     shippingMethodCode: formData.get("shippingMethodCode")?.toString() ?? "",
     paymentMethodCode: formData.get("paymentMethodCode")?.toString() ?? "",
+    senderNumber: formData.get("senderNumber")?.toString() ?? "",
+    transactionId: formData.get("transactionId")?.toString() ?? "",
   };
 
   const parsed = checkoutSchema.safeParse(raw);

@@ -6,6 +6,8 @@ export type PaymentMethodOption = {
   code: string;
   name: string;
   instructions: string | null;
+  requiresManualVerification: boolean;
+  accountDetails: Record<string, string> | null;
 };
 
 export function PaymentMethodSelect({
@@ -41,6 +43,15 @@ export function PaymentMethodSelect({
               <span className="block font-medium text-foreground/90">{method.name}</span>
               {method.instructions ? (
                 <span className="block text-xs text-foreground/60">{method.instructions}</span>
+              ) : null}
+              {isSelected && method.accountDetails && Object.keys(method.accountDetails).length > 0 ? (
+                <span className="mt-2 block rounded-brand-sm bg-white/70 p-2 text-xs text-foreground/80">
+                  {Object.entries(method.accountDetails).map(([key, value]) => (
+                    <span key={key} className="block">
+                      <span className="font-medium">{key}:</span> {value}
+                    </span>
+                  ))}
+                </span>
               ) : null}
             </span>
           </label>

@@ -79,6 +79,8 @@ export function CheckoutForm({
     return method.rateType === "free" ? 0 : Number(method.flatRate ?? 0);
   }, [shippingCode, shippingMethods]);
 
+  const selectedPaymentMethod = paymentMethods.find((m) => m.code === paymentCode);
+
   if (!loading && items.length === 0) {
     return (
       <div className="py-16 text-center">
@@ -137,6 +139,24 @@ export function CheckoutForm({
           <div className="mt-4">
             <PaymentMethodSelect methods={paymentMethods} selected={paymentCode} onChange={setPaymentCode} />
           </div>
+          {selectedPaymentMethod?.requiresManualVerification ? (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field
+                label="Sender Number"
+                name="senderNumber"
+                required
+                placeholder="The number you sent payment from"
+                error={state.fieldErrors?.senderNumber}
+              />
+              <Field
+                label="Transaction ID"
+                name="transactionId"
+                required
+                placeholder="e.g. 8N7A6XYZ12"
+                error={state.fieldErrors?.transactionId}
+              />
+            </div>
+          ) : null}
         </section>
 
         <section>

@@ -26,6 +26,7 @@ export async function savePaymentMethodAction(
     code: formData.get("code")?.toString() ?? "",
     name: formData.get("name")?.toString() ?? "",
     instructions: formData.get("instructions")?.toString() ?? "",
+    accountDetails: formData.get("accountDetails")?.toString() ?? "",
     sortOrder: formData.get("sortOrder")?.toString() ?? "0",
     requiresManualVerification: formData.get("requiresManualVerification") === "on",
     isActive: formData.get("isActive") === "on",

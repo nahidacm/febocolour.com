@@ -3,6 +3,7 @@ import { db } from "@/lib/db/client";
 import { paymentMethodConfigs } from "@/lib/db/schema";
 import type { z } from "zod";
 import type { paymentMethodSchema } from "@/lib/validation/admin/payment";
+import { parseKeyValueLines } from "@/lib/utils/kv-text";
 
 type PaymentInput = z.infer<typeof paymentMethodSchema>;
 
@@ -19,6 +20,7 @@ function toRow(input: PaymentInput) {
     code: input.code,
     name: input.name,
     instructions: input.instructions || null,
+    accountDetails: input.accountDetails ? parseKeyValueLines(input.accountDetails) : null,
     sortOrder: input.sortOrder ?? 0,
     requiresManualVerification: input.requiresManualVerification ?? false,
     isActive: input.isActive ?? false,

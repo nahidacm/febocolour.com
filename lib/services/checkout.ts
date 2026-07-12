@@ -79,6 +79,7 @@ export async function placeOrder(
         shippingMethodId: shippingMethod.id,
         shippingCost: shippingCost.toFixed(2),
         paymentMethodId: paymentMethod.id,
+        paymentStatus: paymentMethod.requiresManualVerification ? "awaiting_verification" : "pending",
         subtotal: subtotal.toFixed(2),
         total: total.toFixed(2),
       })
@@ -104,6 +105,8 @@ export async function placeOrder(
     await tx.insert(orderPaymentDetails).values({
       orderId: inserted.id,
       paymentMethodCode: paymentMethod.code,
+      senderNumber: input.senderNumber || null,
+      transactionId: input.transactionId || null,
       amount: total.toFixed(2),
     });
 

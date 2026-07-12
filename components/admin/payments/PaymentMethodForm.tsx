@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { FormField, FormTextarea, FormCheckbox } from "@/components/admin/FormField";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { savePaymentMethodAction, type PaymentFormState } from "@/lib/actions/admin/payments";
+import { formatKeyValueLines } from "@/lib/utils/kv-text";
 
 const initialState: PaymentFormState = {};
 
@@ -15,6 +16,7 @@ export function PaymentMethodForm({
     code: string;
     name: string;
     instructions: string | null;
+    accountDetails: Record<string, string> | null;
     sortOrder: number;
     requiresManualVerification: boolean;
     isActive: boolean;
@@ -33,6 +35,12 @@ export function PaymentMethodForm({
         label="Instructions (shown to customer at checkout)"
         name="instructions"
         defaultValue={method?.instructions ?? ""}
+        rows={3}
+      />
+      <FormTextarea
+        label="Account Details (one 'Label: Value' per line, e.g. Merchant Number: 01712345678 — shown to customer when this method is selected)"
+        name="accountDetails"
+        defaultValue={formatKeyValueLines(method?.accountDetails)}
         rows={3}
       />
       <FormField label="Sort Order" name="sortOrder" type="number" defaultValue={method?.sortOrder ?? 0} />
