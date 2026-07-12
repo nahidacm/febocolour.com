@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { checkoutSchema } from "@/lib/validation/checkout";
 import { placeOrder } from "@/lib/services/checkout";
 import { readCartTokenHash } from "@/lib/cart/session";
+import { getCurrentCustomer } from "@/lib/auth/customer";
 
 export type CheckoutFormState = {
   error?: string;
@@ -38,7 +39,8 @@ export async function placeOrderAction(
   }
 
   const tokenHash = await readCartTokenHash();
-  const result = await placeOrder(tokenHash, parsed.data);
+  const customer = await getCurrentCustomer();
+  const result = await placeOrder(tokenHash, parsed.data, customer?.id);
 
   if (!result.success) {
     return { error: result.error };

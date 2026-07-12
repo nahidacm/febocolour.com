@@ -20,6 +20,7 @@ export type PlaceOrderResult =
 export async function placeOrder(
   tokenHash: string | undefined,
   input: CheckoutInput,
+  customerId?: number,
 ): Promise<PlaceOrderResult> {
   const cart = await getCartSummary(tokenHash);
   if (cart.items.length === 0) {
@@ -66,6 +67,7 @@ export async function placeOrder(
         // Never committed as-is — replaced with the real FC-###### number below in the
         // same transaction. Just needs to satisfy the NOT NULL + UNIQUE constraint.
         orderNumber: randomUUID(),
+        customerId: customerId ?? null,
         shippingFullName: input.fullName,
         shippingPhone: input.phone,
         email: input.email || null,
