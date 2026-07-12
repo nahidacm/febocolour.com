@@ -9,6 +9,7 @@ import {
 } from "@/lib/db/schema";
 import type { ProductInput } from "@/lib/validation/admin/product";
 import { parseKeyValueLines } from "@/lib/utils/kv-text";
+import { sanitizeDescriptionHtml } from "@/lib/sanitize";
 
 export async function listProductsForAdmin() {
   return db.query.products.findMany({
@@ -36,7 +37,7 @@ function toProductRow(input: ProductInput) {
     sku: input.sku,
     categoryId: input.categoryId ? Number(input.categoryId) : null,
     shortDescription: input.shortDescription || null,
-    description: input.description || null,
+    description: input.description ? sanitizeDescriptionHtml(input.description) : null,
     specifications: input.specifications ? parseKeyValueLines(input.specifications) : null,
     sizeChart: input.sizeChart ? parseKeyValueLines(input.sizeChart) : null,
     regularPrice: input.regularPrice.toFixed(2),
