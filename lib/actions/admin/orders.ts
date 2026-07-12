@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/guards";
 import { writeAuditLog } from "@/lib/audit";
 import { orderStatusUpdateSchema } from "@/lib/validation/admin/order";
-import { getOrderForAdmin, updateOrderStatus } from "@/lib/services/orders";
+import { getOrderForAdmin, updateOrderStatus, verifyOrderPayment } from "@/lib/services/orders";
 
 export type OrderStatusFormState = { error?: string; success?: boolean };
 
@@ -39,4 +39,23 @@ export async function updateOrderStatusAction(
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
   return { success: true };
+}
+
+export async function verifyOrderPaymentAction(orderPaymentDetailId: number, orderId: number) {
+  const admin = await requireAdmin();
+  const result = await verifyOrderPayment(orderPaymentDetailId, admin.id);
+
+  if (result) {
+    await writeAuditLog({
+      adminUserId: admin.id,
+      action: "verify_payment",
+      entityType: "order",
+      entityId: orderId,
+      changes: { transactionId: result.detail.transactionId, paymentStatus: { to: "paid" } },
+    });
+  }
+
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
 }

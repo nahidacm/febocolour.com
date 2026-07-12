@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { OrderStatusForm } from "@/components/admin/orders/OrderStatusForm";
+import { VerifyPaymentButton } from "@/components/admin/orders/VerifyPaymentButton";
+import { verifyOrderPaymentAction } from "@/lib/actions/admin/orders";
 import { getOrderForAdmin } from "@/lib/services/orders";
 
 export const dynamic = "force-dynamic";
@@ -64,13 +66,27 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
               {order.paymentMethod.name}
             </p>
             {order.paymentDetails.map((pd) => (
-              <p key={pd.id}>
-                <span className="font-medium text-foreground">
-                  Transaction:
-                </span>{" "}
-                {pd.transactionId ?? "—"}{" "}
-                {pd.senderNumber ? `(from ${pd.senderNumber})` : ""}
-              </p>
+              <div key={pd.id} className="flex flex-wrap items-center justify-between gap-2">
+                <p>
+                  <span className="font-medium text-foreground">
+                    Transaction:
+                  </span>{" "}
+                  {pd.transactionId ?? "—"}{" "}
+                  {pd.senderNumber ? `(from ${pd.senderNumber})` : ""}
+                </p>
+                {pd.transactionId ? (
+                  pd.verifiedAt ? (
+                    <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                      Verified {new Date(pd.verifiedAt).toLocaleDateString()}
+                      {pd.verifiedByAdmin ? ` by ${pd.verifiedByAdmin.fullName}` : ""}
+                    </span>
+                  ) : (
+                    <VerifyPaymentButton
+                      action={verifyOrderPaymentAction.bind(null, pd.id, order.id)}
+                    />
+                  )
+                ) : null}
+              </div>
             ))}
           </div>
         </div>

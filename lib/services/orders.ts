@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { orders } from "@/lib/db/schema";
+import { orderPaymentDetails, orders } from "@/lib/db/schema";
 import type { orderStatusEnum, paymentStatusEnum } from "@/lib/db/schema";
 
 export async function getOrderByNumber(orderNumber: string) {
@@ -32,9 +32,26 @@ export async function getOrderForAdmin(id: number) {
       items: true,
       shippingMethod: true,
       paymentMethod: true,
-      paymentDetails: true,
+      paymentDetails: { with: { verifiedByAdmin: true } },
     },
   });
+}
+
+export async function verifyOrderPayment(orderPaymentDetailId: number, adminId: number) {
+  const [detail] = await db
+    .update(orderPaymentDetails)
+    .set({ verifiedAt: new Date(), verifiedByAdminId: adminId })
+    .where(eq(orderPaymentDetails.id, orderPaymentDetailId))
+    .returning();
+  if (!detail) return null;
+
+  const [order] = await db
+    .update(orders)
+    .set({ paymentStatus: "paid", updatedAt: new Date() })
+    .where(eq(orders.id, detail.orderId))
+    .returning();
+
+  return { detail, order };
 }
 
 export async function updateOrderStatus(
