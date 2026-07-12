@@ -374,7 +374,8 @@ async function main() {
     {
       title: "Elegant Hijabs & Abayas, for Every Age",
       subtitle: "Premium, comfortable and beautifully soft — including a dedicated collection for baby girls. Order easily, we deliver across Bangladesh.",
-      image: "banners/hero-1.jpg",
+      // No real photo yet — upload one via /admin/banners. HeroBanner falls back to a placeholder.
+      image: "",
       ctaLabel: "Shop Now",
       ctaUrl: "/category/hijab",
       secondaryCtaLabel: "Baby Girl Collection",

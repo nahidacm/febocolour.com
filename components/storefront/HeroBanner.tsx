@@ -1,9 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PlaceholderImage } from "@/components/storefront/PlaceholderImage";
 
 export type HeroBannerData = {
   title: string;
   subtitle?: string | null;
+  image?: string | null;
   ctaLabel?: string | null;
   ctaUrl?: string | null;
   secondaryCtaLabel?: string | null;
@@ -53,10 +55,23 @@ export function HeroBanner({ banner = fallback }: { banner?: HeroBannerData }) {
             ) : null}
           </div>
         </div>
-        <PlaceholderImage
-          className="order-1 aspect-4/3 w-full rounded-brand-xl lg:order-2"
-          iconClassName="h-12 w-12"
-        />
+        {banner.image ? (
+          <div className="relative order-1 aspect-4/3 w-full overflow-hidden rounded-brand-xl lg:order-2">
+            <Image
+              src={`/uploads/${banner.image}`}
+              alt={banner.title}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              priority
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <PlaceholderImage
+            className="order-1 aspect-4/3 w-full rounded-brand-xl lg:order-2"
+            iconClassName="h-12 w-12"
+          />
+        )}
       </div>
     </section>
   );
