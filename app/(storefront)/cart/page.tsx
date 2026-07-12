@@ -7,6 +7,7 @@ import { getCartSummary } from "@/lib/services/cart";
 
 export const metadata = pageMetadata({
   title: "Your Cart",
+  description: "Review the items in your FeboColour cart before checking out.",
   path: "/cart",
   noIndex: true,
 });
