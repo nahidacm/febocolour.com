@@ -413,9 +413,10 @@ async function main() {
   ]);
 
   // ---- Payment methods ---------------------------------------------------
-  // Only COD is active in Phase 2 — bKash/Nagad/Rocket/Bank Transfer manual
-  // entry forms ship in Phase 5; the config rows exist now so activating
-  // them later is just a data + UI change, not a schema change.
+  // bKash/Nagad/Rocket/Bank Transfer are manual/instructions-based (Phase 5) — the
+  // customer submits a transaction ID at checkout and an admin verifies it against
+  // accountDetails below before marking the order paid. Merchant numbers/account
+  // details here are placeholders — replace with the real ones via /admin/payments.
   await db.insert(paymentMethodConfigs).values([
     {
       code: "cod",
@@ -429,7 +430,8 @@ async function main() {
       code: "bkash",
       name: "bKash",
       instructions: "Send payment to our bKash merchant number and share the transaction ID.",
-      isActive: false,
+      accountDetails: { "Merchant Number": "01712345678", Type: "Send Money" },
+      isActive: true,
       requiresManualVerification: true,
       sortOrder: 2,
     },
@@ -437,7 +439,8 @@ async function main() {
       code: "nagad",
       name: "Nagad",
       instructions: "Send payment to our Nagad merchant number and share the transaction ID.",
-      isActive: false,
+      accountDetails: { "Merchant Number": "01812345678", Type: "Send Money" },
+      isActive: true,
       requiresManualVerification: true,
       sortOrder: 3,
     },
@@ -445,7 +448,8 @@ async function main() {
       code: "rocket",
       name: "Rocket",
       instructions: "Send payment to our Rocket merchant number and share the transaction ID.",
-      isActive: false,
+      accountDetails: { "Merchant Number": "01912345678-1", Type: "Send Money" },
+      isActive: true,
       requiresManualVerification: true,
       sortOrder: 4,
     },
@@ -453,7 +457,13 @@ async function main() {
       code: "bank_transfer",
       name: "Bank Transfer",
       instructions: "Transfer to our bank account and share the transaction reference.",
-      isActive: false,
+      accountDetails: {
+        Bank: "Dutch-Bangla Bank",
+        "Account Name": "FeboColour",
+        "Account Number": "1234567890",
+        "Routing Number": "090261234",
+      },
+      isActive: true,
       requiresManualVerification: true,
       sortOrder: 5,
     },
