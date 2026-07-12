@@ -218,4 +218,8 @@ export const orderPaymentDetailsRelations = relations(orderPaymentDetails, ({ on
     fields: [orderPaymentDetails.orderId],
     references: [orders.id],
   }),
+  verifiedByAdmin: one(adminUsers, {
+    fields: [orderPaymentDetails.verifiedByAdminId],
+    references: [adminUsers.id],
+  }),
 }));

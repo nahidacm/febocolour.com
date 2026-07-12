@@ -12,7 +12,7 @@ import { products } from "@/lib/db/schema/products";
 import { productVariants } from "@/lib/db/schema/attributes";
 import { paymentMethodConfigs, shippingMethodConfigs } from "@/lib/db/schema/config";
 import { orderStatusEnum, paymentStatusEnum } from "@/lib/db/schema/enums";
-import { customers } from "@/lib/db/schema/auth";
+import { adminUsers, customers } from "@/lib/db/schema/auth";
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
@@ -73,4 +73,7 @@ export const orderPaymentDetails = pgTable("order_payment_details", {
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull().defaultNow(),
   verifiedAt: timestamp("verified_at", { withTimezone: true }),
+  verifiedByAdminId: integer("verified_by_admin_id").references(() => adminUsers.id, {
+    onDelete: "set null",
+  }),
 });

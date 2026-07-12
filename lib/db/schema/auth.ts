@@ -18,6 +18,8 @@ export const adminUsers = pgTable("admin_users", {
   fullName: varchar("full_name", { length: 150 }).notNull(),
   role: adminRoleEnum("role").notNull().default("staff"),
   isActive: boolean("is_active").notNull().default(true),
+  failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -41,6 +43,8 @@ export const customers = pgTable("customers", {
   passwordHash: varchar("password_hash", { length: 255 }),
   fullName: varchar("full_name", { length: 150 }).notNull(),
   emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+  failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

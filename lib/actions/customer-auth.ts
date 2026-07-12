@@ -1,10 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db/client";
+import { customers } from "@/lib/db/schema";
 import { loginSchema, registerSchema } from "@/lib/validation/auth";
 import { findCustomerByEmail, registerCustomer, linkCartToCustomer } from "@/lib/services/customers";
 import { verifyPassword } from "@/lib/auth/password";
 import { createCustomerSession, destroyCustomerSession } from "@/lib/auth/customer";
+import { isLockedOut, nextLockoutState, LOCKOUT_MESSAGE } from "@/lib/auth/lockout";
 import { readCartTokenHash } from "@/lib/cart/session";
 
 export type CustomerAuthState = { error?: string; fieldErrors?: Record<string, string> };
@@ -55,8 +59,18 @@ export async function customerLoginAction(
   const customer = await findCustomerByEmail(parsed.data.email);
   if (!customer || !customer.passwordHash) return { error: "Invalid email or password." };
 
+  if (isLockedOut(customer.lockedUntil)) return { error: LOCKOUT_MESSAGE };
+
   const valid = await verifyPassword(customer.passwordHash, parsed.data.password);
-  if (!valid) return { error: "Invalid email or password." };
+  if (!valid) {
+    const { failedLoginAttempts, lockedUntil } = nextLockoutState(customer.failedLoginAttempts);
+    await db.update(customers).set({ failedLoginAttempts, lockedUntil }).where(eq(customers.id, customer.id));
+    return { error: lockedUntil ? LOCKOUT_MESSAGE : "Invalid email or password." };
+  }
+
+  if (customer.failedLoginAttempts > 0) {
+    await db.update(customers).set({ failedLoginAttempts: 0, lockedUntil: null }).where(eq(customers.id, customer.id));
+  }
 
   await createCustomerSession(customer.id);
 
