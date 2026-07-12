@@ -54,6 +54,7 @@ export default async function AdminBannersPage() {
                         src={`/uploads/${banner.image}`}
                         alt=""
                         fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>

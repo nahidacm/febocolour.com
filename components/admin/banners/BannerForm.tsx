@@ -32,7 +32,7 @@ export function BannerForm({
 
       {banner?.image ? (
         <div className="relative h-40 w-full overflow-hidden rounded-brand-md border border-brand-100">
-          <Image src={`/uploads/${banner.image}`} alt="" fill className="object-cover" />
+          <Image src={`/uploads/${banner.image}`} alt="" fill sizes="576px" className="object-cover" />
         </div>
       ) : null}
 
