@@ -5,6 +5,7 @@ import { checkoutSchema } from "@/lib/validation/checkout";
 import { placeOrder } from "@/lib/services/checkout";
 import { readCartTokenHash } from "@/lib/cart/session";
 import { getCurrentCustomer } from "@/lib/auth/customer";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export type CheckoutFormState = {
   error?: string;
@@ -15,6 +16,12 @@ export async function placeOrderAction(
   _prevState: CheckoutFormState,
   formData: FormData,
 ): Promise<CheckoutFormState> {
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`checkout:${ip}`, 10, 60 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return { error: "Too many orders placed from this connection recently. Please try again later." };
+  }
+
   const raw = {
     fullName: formData.get("fullName")?.toString() ?? "",
     phone: formData.get("phone")?.toString() ?? "",

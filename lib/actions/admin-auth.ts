@@ -7,6 +7,7 @@ import { adminUsers } from "@/lib/db/schema";
 import { verifyPassword } from "@/lib/auth/password";
 import { createAdminSession, destroyAdminSession } from "@/lib/auth/admin";
 import { isLockedOut, nextLockoutState, LOCKOUT_MESSAGE } from "@/lib/auth/lockout";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { loginSchema } from "@/lib/validation/auth";
 
 export type AdminLoginState = { error?: string };
@@ -15,6 +16,10 @@ export async function adminLoginAction(
   _prevState: AdminLoginState,
   formData: FormData,
 ): Promise<AdminLoginState> {
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`admin-login:${ip}`, 10, 5 * 60 * 1000);
+  if (!rateLimit.allowed) return { error: "Too many login attempts. Please wait a few minutes and try again." };
+
   const parsed = loginSchema.safeParse({
     email: formData.get("email")?.toString() ?? "",
     password: formData.get("password")?.toString() ?? "",

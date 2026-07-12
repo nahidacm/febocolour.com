@@ -9,6 +9,7 @@ import { findCustomerByEmail, registerCustomer, linkCartToCustomer } from "@/lib
 import { verifyPassword } from "@/lib/auth/password";
 import { createCustomerSession, destroyCustomerSession } from "@/lib/auth/customer";
 import { isLockedOut, nextLockoutState, LOCKOUT_MESSAGE } from "@/lib/auth/lockout";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { readCartTokenHash } from "@/lib/cart/session";
 
 export type CustomerAuthState = { error?: string; fieldErrors?: Record<string, string> };
@@ -17,6 +18,12 @@ export async function customerRegisterAction(
   _prevState: CustomerAuthState,
   formData: FormData,
 ): Promise<CustomerAuthState> {
+  const registerIp = await getClientIp();
+  const registerRateLimit = checkRateLimit(`customer-register:${registerIp}`, 5, 60 * 60 * 1000);
+  if (!registerRateLimit.allowed) {
+    return { error: "Too many registration attempts. Please try again later." };
+  }
+
   const parsed = registerSchema.safeParse({
     fullName: formData.get("fullName")?.toString() ?? "",
     email: formData.get("email")?.toString() ?? "",
@@ -50,6 +57,10 @@ export async function customerLoginAction(
   _prevState: CustomerAuthState,
   formData: FormData,
 ): Promise<CustomerAuthState> {
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`customer-login:${ip}`, 10, 5 * 60 * 1000);
+  if (!rateLimit.allowed) return { error: "Too many login attempts. Please wait a few minutes and try again." };
+
   const parsed = loginSchema.safeParse({
     email: formData.get("email")?.toString() ?? "",
     password: formData.get("password")?.toString() ?? "",

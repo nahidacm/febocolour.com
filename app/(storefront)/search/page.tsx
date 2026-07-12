@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { browseProducts, type ProductFilter } from "@/lib/services/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const metadata = pageMetadata({
   title: "Search Products",
@@ -23,7 +24,9 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const { q, filter } = await searchParams;
   const validFilter = filter && filter in filterLabels ? (filter as ProductFilter) : undefined;
 
-  const products = await browseProducts({ q, filter: validFilter });
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`search:${ip}`, 30, 60 * 1000);
+  const products = rateLimit.allowed ? await browseProducts({ q, filter: validFilter }) : [];
 
   const heading = q
     ? `Search results for "${q}"`
@@ -49,20 +52,29 @@ export default async function SearchPage({ searchParams }: PageProps) {
       <h1 className="mt-8 font-display text-2xl font-semibold text-foreground sm:text-3xl">
         {heading}
       </h1>
-      <p className="mt-1 text-sm text-foreground/60">
-        {products.length} {products.length === 1 ? "product" : "products"} found
-      </p>
 
-      {products.length > 0 ? (
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.slug} product={product} headingLevel="h2" />
-          ))}
-        </div>
-      ) : (
+      {!rateLimit.allowed ? (
         <p className="mt-10 text-sm text-foreground/60">
-          No products found. Try a different search term.
+          Too many searches from this connection. Please wait a moment and try again.
         </p>
+      ) : (
+        <>
+          <p className="mt-1 text-sm text-foreground/60">
+            {products.length} {products.length === 1 ? "product" : "products"} found
+          </p>
+
+          {products.length > 0 ? (
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.slug} product={product} headingLevel="h2" />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-10 text-sm text-foreground/60">
+              No products found. Try a different search term.
+            </p>
+          )}
+        </>
       )}
     </div>
   );
