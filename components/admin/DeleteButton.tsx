@@ -26,7 +26,7 @@ export function DeleteButton({
           router.refresh();
         });
       }}
-      className="text-foreground/40 hover:text-red-600 disabled:opacity-50"
+      className="text-foreground/70 hover:text-red-600 disabled:opacity-50"
     >
       <Trash2 className="h-4 w-4" />
     </button>

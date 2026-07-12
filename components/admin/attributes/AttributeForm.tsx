@@ -4,7 +4,10 @@ import { useActionState, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { FormField } from "@/components/admin/FormField";
 import { SubmitButton } from "@/components/admin/SubmitButton";
-import { saveAttributeAction, type AttributeFormState } from "@/lib/actions/admin/attributes";
+import {
+  saveAttributeAction,
+  type AttributeFormState,
+} from "@/lib/actions/admin/attributes";
 
 const initialState: AttributeFormState = {};
 
@@ -32,7 +35,11 @@ export function AttributeForm({
   const [state, formAction] = useActionState(saveAttributeAction, initialState);
   const [inputType, setInputType] = useState(attribute?.inputType ?? "select");
   const [rows, setRows] = useState<ValueRow[]>(
-    attribute?.values.map((v) => ({ value: v.value, slug: v.slug, swatchHex: v.swatchHex ?? "" })) ?? [],
+    attribute?.values.map((v) => ({
+      value: v.value,
+      slug: v.slug,
+      swatchHex: v.swatchHex ?? "",
+    })) ?? [],
   );
 
   function addRow() {
@@ -40,7 +47,9 @@ export function AttributeForm({
   }
 
   function updateRow(index: number, patch: Partial<ValueRow>) {
-    setRows((prev) => prev.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+    setRows((prev) =>
+      prev.map((r, i) => (i === index ? { ...r, ...patch } : r)),
+    );
   }
 
   function removeRow(index: number) {
@@ -49,23 +58,42 @@ export function AttributeForm({
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">
-      {attribute ? <input type="hidden" name="id" value={attribute.id} /> : null}
+      {attribute ? (
+        <input type="hidden" name="id" value={attribute.id} />
+      ) : null}
       <input type="hidden" name="valuesJson" value={JSON.stringify(rows)} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Name" name="name" defaultValue={attribute?.name} required error={state.fieldErrors?.name} />
-        <FormField label="Slug" name="slug" defaultValue={attribute?.slug} required error={state.fieldErrors?.slug} />
+        <FormField
+          label="Name"
+          name="name"
+          defaultValue={attribute?.name}
+          required
+          error={state.fieldErrors?.name}
+        />
+        <FormField
+          label="Slug"
+          name="slug"
+          defaultValue={attribute?.slug}
+          required
+          error={state.fieldErrors?.slug}
+        />
       </div>
 
       <div>
-        <label htmlFor="inputType" className="text-sm font-medium text-foreground/80">
+        <label
+          htmlFor="inputType"
+          className="text-sm font-medium text-foreground/80"
+        >
           Input Type
         </label>
         <select
           id="inputType"
           name="inputType"
           value={inputType}
-          onChange={(e) => setInputType(e.target.value as "select" | "color_swatch")}
+          onChange={(e) =>
+            setInputType(e.target.value as "select" | "color_swatch")
+          }
           className="mt-1.5 w-full rounded-brand-md border border-brand-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-brand-400"
         >
           <option value="select">Select (text pills)</option>
@@ -92,7 +120,10 @@ export function AttributeForm({
               <input
                 value={row.value}
                 onChange={(e) =>
-                  updateRow(i, { value: e.target.value, slug: row.slug || slugify(e.target.value) })
+                  updateRow(i, {
+                    value: e.target.value,
+                    slug: row.slug || slugify(e.target.value),
+                  })
                 }
                 placeholder="Value (e.g. Baby Pink)"
                 className="flex-1 rounded-brand-sm border border-brand-200 px-2.5 py-1.5 text-sm"
@@ -111,7 +142,11 @@ export function AttributeForm({
                   className="h-9 w-10 rounded-brand-sm border border-brand-200"
                 />
               ) : null}
-              <button type="button" onClick={() => removeRow(i)} className="text-foreground/40 hover:text-red-600">
+              <button
+                type="button"
+                onClick={() => removeRow(i)}
+                className="text-foreground/70 hover:text-red-600"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -119,8 +154,12 @@ export function AttributeForm({
         </div>
       </div>
 
-      {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
-      <SubmitButton>{attribute ? "Save Changes" : "Create Attribute"}</SubmitButton>
+      {state.error ? (
+        <p className="text-sm text-red-600">{state.error}</p>
+      ) : null}
+      <SubmitButton>
+        {attribute ? "Save Changes" : "Create Attribute"}
+      </SubmitButton>
     </form>
   );
 }

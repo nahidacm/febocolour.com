@@ -14,7 +14,9 @@ export default async function AdminBannersPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold text-foreground">Homepage Banners</h1>
+        <h1 className="font-display text-2xl font-semibold text-foreground">
+          Homepage Banners
+        </h1>
         <Link
           href="/admin/banners/new"
           className="flex items-center gap-1.5 rounded-brand-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
@@ -31,11 +33,15 @@ export default async function AdminBannersPage() {
         <Table>
           <thead>
             <tr>
-              <Th></Th>
+              <Th>
+                <span className="sr-only">Image</span>
+              </Th>
               <Th>Title</Th>
               <Th>Sort</Th>
               <Th>Status</Th>
-              <Th></Th>
+              <Th>
+                <span className="sr-only">Actions</span>
+              </Th>
             </tr>
           </thead>
           <tbody>
@@ -44,14 +50,22 @@ export default async function AdminBannersPage() {
                 <Td className="w-14">
                   {banner.image ? (
                     <div className="relative h-10 w-16 overflow-hidden rounded-brand-sm">
-                      <Image src={`/uploads/${banner.image}`} alt="" fill className="object-cover" />
+                      <Image
+                        src={`/uploads/${banner.image}`}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                   ) : (
                     <div className="h-10 w-16 rounded-brand-sm bg-brand-50" />
                   )}
                 </Td>
                 <Td>
-                  <Link href={`/admin/banners/${banner.id}`} className="font-medium hover:text-brand-700">
+                  <Link
+                    href={`/admin/banners/${banner.id}`}
+                    className="font-medium hover:text-brand-700"
+                  >
                     {banner.title}
                   </Link>
                 </Td>
@@ -61,14 +75,17 @@ export default async function AdminBannersPage() {
                     className={
                       banner.isActive
                         ? "rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700"
-                        : "rounded-full bg-foreground/10 px-2 py-0.5 text-xs font-medium text-foreground/60"
+                        : "rounded-full bg-foreground/10 px-2 py-0.5 text-xs font-medium text-foreground/70"
                     }
                   >
                     {banner.isActive ? "Active" : "Inactive"}
                   </span>
                 </Td>
                 <Td className="text-right">
-                  <DeleteButton action={deleteBannerAction.bind(null, banner.id)} confirmText={`Delete "${banner.title}"?`} />
+                  <DeleteButton
+                    action={deleteBannerAction.bind(null, banner.id)}
+                    confirmText={`Delete "${banner.title}"?`}
+                  />
                 </Td>
               </tr>
             ))}

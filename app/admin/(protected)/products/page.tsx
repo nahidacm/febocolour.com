@@ -14,7 +14,9 @@ export default async function AdminProductsPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold text-foreground">Products ({items.length})</h1>
+        <h1 className="font-display text-2xl font-semibold text-foreground">
+          Products ({items.length})
+        </h1>
         <Link
           href="/admin/products/new"
           className="flex items-center gap-1.5 rounded-brand-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
@@ -28,13 +30,17 @@ export default async function AdminProductsPage() {
         <Table>
           <thead>
             <tr>
-              <Th></Th>
+              <Th>
+                <span className="sr-only">Image</span>
+              </Th>
               <Th>Name</Th>
               <Th>Category</Th>
               <Th>Price</Th>
               <Th>Stock</Th>
               <Th>Status</Th>
-              <Th></Th>
+              <Th>
+                <span className="sr-only">Actions</span>
+              </Th>
             </tr>
           </thead>
           <tbody>
@@ -43,17 +49,26 @@ export default async function AdminProductsPage() {
                 <Td className="w-14">
                   {product.images[0] ? (
                     <div className="relative h-10 w-10 overflow-hidden rounded-brand-sm">
-                      <Image src={`/uploads/${product.images[0].storageKey}`} alt="" fill sizes="40px" className="object-cover" />
+                      <Image
+                        src={`/uploads/${product.images[0].storageKey}`}
+                        alt=""
+                        fill
+                        sizes="40px"
+                        className="object-cover"
+                      />
                     </div>
                   ) : (
                     <div className="h-10 w-10 rounded-brand-sm bg-brand-50" />
                   )}
                 </Td>
                 <Td>
-                  <Link href={`/admin/products/${product.id}`} className="font-medium hover:text-brand-700">
+                  <Link
+                    href={`/admin/products/${product.id}`}
+                    className="font-medium hover:text-brand-700"
+                  >
                     {product.name}
                   </Link>
-                  <p className="text-xs text-foreground/50">{product.sku}</p>
+                  <p className="text-xs text-foreground/70">{product.sku}</p>
                 </Td>
                 <Td>{product.category?.name ?? "—"}</Td>
                 <Td>৳{Number(product.regularPrice).toLocaleString("en-US")}</Td>
@@ -63,14 +78,17 @@ export default async function AdminProductsPage() {
                     className={
                       product.isActive
                         ? "rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700"
-                        : "rounded-full bg-foreground/10 px-2 py-0.5 text-xs font-medium text-foreground/60"
+                        : "rounded-full bg-foreground/10 px-2 py-0.5 text-xs font-medium text-foreground/70"
                     }
                   >
                     {product.isActive ? "Active" : "Inactive"}
                   </span>
                 </Td>
                 <Td className="text-right">
-                  <DeleteButton action={deleteProductAction.bind(null, product.id)} confirmText={`Delete "${product.name}"?`} />
+                  <DeleteButton
+                    action={deleteProductAction.bind(null, product.id)}
+                    confirmText={`Delete "${product.name}"?`}
+                  />
                 </Td>
               </tr>
             ))}

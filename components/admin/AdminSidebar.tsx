@@ -31,7 +31,14 @@ type NavItem = {
 
 const navGroups: { label?: string; items: NavItem[] }[] = [
   {
-    items: [{ href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true }],
+    items: [
+      {
+        href: "/admin",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        exact: true,
+      },
+    ],
   },
   {
     label: "Catalog",
@@ -74,21 +81,25 @@ export function AdminSidebar({ adminName }: { adminName: string }) {
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col border-r border-brand-100 bg-white">
       <div className="border-b border-brand-100 px-5 py-4">
-        <span className="font-display text-lg font-semibold text-brand-700">FeboColour</span>
-        <span className="ml-1.5 text-xs text-foreground/50">Admin</span>
+        <span className="font-display text-lg font-semibold text-brand-700">
+          FeboColour
+        </span>
+        <span className="ml-1.5 text-xs text-foreground/70">Admin</span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {navGroups.map((group, i) => (
           <div key={i} className={i > 0 ? "mt-5" : undefined}>
             {group.label ? (
-              <p className="px-2 text-[10px] font-semibold tracking-wider text-foreground/40 uppercase">
+              <p className="px-2 text-[10px] font-semibold tracking-wider text-foreground/70 uppercase">
                 {group.label}
               </p>
             ) : null}
             <div className="mt-1.5 space-y-0.5">
               {group.items.map((item) => {
-                const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+                const isActive = item.exact
+                  ? pathname === item.href
+                  : pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.href}
@@ -111,7 +122,7 @@ export function AdminSidebar({ adminName }: { adminName: string }) {
       </nav>
 
       <div className="border-t border-brand-100 p-3">
-        <p className="truncate px-2 text-xs text-foreground/50">{adminName}</p>
+        <p className="truncate px-2 text-xs text-foreground/70">{adminName}</p>
         <form action={adminLogoutAction}>
           <button
             type="submit"

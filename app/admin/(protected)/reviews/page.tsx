@@ -11,7 +11,9 @@ export default async function AdminReviewsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold text-foreground">Reviews ({items.length})</h1>
+      <h1 className="font-display text-2xl font-semibold text-foreground">
+        Reviews ({items.length})
+      </h1>
 
       <div className="mt-6">
         <Table>
@@ -22,18 +24,25 @@ export default async function AdminReviewsPage() {
               <Th>Rating</Th>
               <Th>Review</Th>
               <Th>Status</Th>
-              <Th></Th>
+              <Th>
+                <span className="sr-only">Actions</span>
+              </Th>
             </tr>
           </thead>
           <tbody>
             {items.map((review) => (
               <tr key={review.id}>
                 <Td>
-                  <Link href={`/product/${review.product.slug}`} className="hover:text-brand-700">
+                  <Link
+                    href={`/product/${review.product.slug}`}
+                    className="hover:text-brand-700"
+                  >
                     {review.product.name}
                   </Link>
                 </Td>
-                <Td>{review.customer?.fullName ?? review.guestName ?? "Guest"}</Td>
+                <Td>
+                  {review.customer?.fullName ?? review.guestName ?? "Guest"}
+                </Td>
                 <Td>
                   <span className="flex items-center gap-0.5 text-brand-600">
                     {Array.from({ length: review.rating }).map((_, i) => (
@@ -42,7 +51,11 @@ export default async function AdminReviewsPage() {
                   </span>
                 </Td>
                 <Td className="max-w-xs">
-                  {review.title ? <p className="font-medium text-foreground/90">{review.title}</p> : null}
+                  {review.title ? (
+                    <p className="font-medium text-foreground/90">
+                      {review.title}
+                    </p>
+                  ) : null}
                   <p className="text-foreground/60">{review.body}</p>
                 </Td>
                 <Td>
@@ -57,13 +70,18 @@ export default async function AdminReviewsPage() {
                   </span>
                 </Td>
                 <Td>
-                  <ReviewActions id={review.id} isApproved={review.isApproved} />
+                  <ReviewActions
+                    id={review.id}
+                    isApproved={review.isApproved}
+                  />
                 </Td>
               </tr>
             ))}
           </tbody>
         </Table>
-        {items.length === 0 ? <p className="mt-4 text-sm text-foreground/60">No reviews yet.</p> : null}
+        {items.length === 0 ? (
+          <p className="mt-4 text-sm text-foreground/60">No reviews yet.</p>
+        ) : null}
       </div>
     </div>
   );

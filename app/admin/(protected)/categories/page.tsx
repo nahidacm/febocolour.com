@@ -13,7 +13,9 @@ export default async function AdminCategoriesPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold text-foreground">Categories ({items.length})</h1>
+        <h1 className="font-display text-2xl font-semibold text-foreground">
+          Categories ({items.length})
+        </h1>
         <Link
           href="/admin/categories/new"
           className="flex items-center gap-1.5 rounded-brand-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
@@ -29,15 +31,22 @@ export default async function AdminCategoriesPage() {
             <tr>
               <Th>Name</Th>
               <Th>Slug</Th>
-              <Th></Th>
+              <Th>
+                <span className="sr-only">Actions</span>
+              </Th>
             </tr>
           </thead>
           <tbody>
             {items.map((category) => (
               <tr key={category.id}>
                 <Td>
-                  <Link href={`/admin/categories/${category.id}`} className="font-medium hover:text-brand-700">
-                    {category.parentId ? <span className="text-foreground/40">— </span> : null}
+                  <Link
+                    href={`/admin/categories/${category.id}`}
+                    className="font-medium hover:text-brand-700"
+                  >
+                    {category.parentId ? (
+                      <span className="text-foreground/70">— </span>
+                    ) : null}
                     {category.name}
                   </Link>
                 </Td>

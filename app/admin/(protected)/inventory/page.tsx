@@ -9,8 +9,12 @@ export default async function AdminInventoryPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold text-foreground">Inventory</h1>
-      <p className="mt-1 text-sm text-foreground/60">Sorted by stock, lowest first. Edit stock from the product page.</p>
+      <h1 className="font-display text-2xl font-semibold text-foreground">
+        Inventory
+      </h1>
+      <p className="mt-1 text-sm text-foreground/60">
+        Sorted by stock, lowest first. Edit stock from the product page.
+      </p>
 
       <div className="mt-6">
         <Table>
@@ -26,13 +30,26 @@ export default async function AdminInventoryPage() {
             {items.map((item) => (
               <tr key={item.key}>
                 <Td>
-                  <Link href={`/admin/products/${item.productId}`} className="font-medium hover:text-brand-700">
+                  <Link
+                    href={`/admin/products/${item.productId}`}
+                    className="font-medium hover:text-brand-700"
+                  >
                     {item.productName}
                   </Link>
-                  {item.variantLabel ? <p className="text-xs text-foreground/50">{item.variantLabel}</p> : null}
+                  {item.variantLabel ? (
+                    <p className="text-xs text-foreground/70">
+                      {item.variantLabel}
+                    </p>
+                  ) : null}
                 </Td>
                 <Td className="text-foreground/60">{item.sku}</Td>
-                <Td className={item.stockQuantity <= 5 ? "font-semibold text-red-600" : undefined}>
+                <Td
+                  className={
+                    item.stockQuantity <= 5
+                      ? "font-semibold text-red-600"
+                      : undefined
+                  }
+                >
                   {item.stockQuantity}
                 </Td>
                 <Td>
