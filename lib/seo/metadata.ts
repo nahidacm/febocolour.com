@@ -17,10 +17,15 @@ export function pageMetadata({
   title: string;
   description?: string;
   path: string;
-  image?: string;
+  /** Omit entirely (leave undefined) when the route has its own opengraph-image.tsx —
+   *  explicit `openGraph.images` here would take precedence over and hide that file
+   *  convention. Pass a URL to override with a specific image, or nothing for the
+   *  sitewide logo fallback. */
+  image?: string | null;
   noIndex?: boolean;
 }): Metadata {
-  const images = [image ?? "/febo-logo.png"];
+  const usesFileConventionImage = image === null;
+  const images = usesFileConventionImage ? undefined : [image ?? "/febo-logo.png"];
 
   return {
     title,
@@ -34,13 +39,13 @@ export function pageMetadata({
       siteName: siteConfig.name,
       locale: "en_US",
       type: "website",
-      images,
+      ...(images ? { images } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images,
+      ...(images ? { images } : {}),
     },
   };
 }

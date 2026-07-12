@@ -27,7 +27,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: product.seoTitle || product.name,
     description: product.seoDescription || product.shortDescription || undefined,
     path: `/product/${product.slug}`,
-    image: product.ogImage ?? undefined,
+    // null (not undefined) — lets the route's opengraph-image.tsx file convention
+    // supply the image, unless the admin explicitly set one.
+    image: product.ogImage || null,
   });
 }
 
