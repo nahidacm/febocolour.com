@@ -58,7 +58,20 @@ was built against.
    npm run db:seed
    ```
 
-5. Start the dev server:
+5. (Optional) Seed demo images, so the storefront doesn't look empty while developing:
+
+   ```bash
+   npx tsx scripts/seed-demo-images.ts
+   ```
+
+   Downloads free-license stock photos (Unsplash) for every seeded product, category,
+   and the homepage banner, and saves them through the same local storage adapter a real
+   admin upload uses. **Dev/demo placeholders only** — not licensed for production use;
+   replace with real product photography (via the admin panel) before going live. Safe
+   to re-run — it skips anything that already has an image, whether from this script or
+   a real upload.
+
+6. Start the dev server:
 
    ```bash
    npm run dev
@@ -83,6 +96,7 @@ at it (see `.env.example`); the web UI is at http://localhost:1080.
 | `npm run db:migrate` | Apply pending migrations |
 | `npm run db:studio` | Drizzle Studio (DB browser) |
 | `npm run db:seed` | Seed sample catalog/config/admin data |
+| `npx tsx scripts/seed-demo-images.ts` | Seed free-license stock photos for products/categories/banner (dev/demo only, see setup step 5) |
 
 ## Project structure
 
