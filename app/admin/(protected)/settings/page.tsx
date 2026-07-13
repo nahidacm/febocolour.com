@@ -10,8 +10,8 @@ export default async function AdminSettingsPage() {
     <div>
       <h1 className="font-display text-2xl font-semibold text-foreground">Settings</h1>
       <p className="mt-1 max-w-xl text-sm text-foreground/60">
-        Saved here for future use — the storefront currently reads phone/WhatsApp/Messenger
-        links from a static config file, not these values yet.
+        Phone, WhatsApp, and Messenger changes apply across the storefront immediately
+        after saving.
       </p>
       <div className="mt-6">
         <SettingsForm settings={settings} />

@@ -1,14 +1,19 @@
 import { MessageCircle } from "lucide-react";
-import { siteConfig } from "@/lib/site-config";
 
-export function FloatingContactButtons() {
+export function FloatingContactButtons({
+  whatsappUrl,
+  messengerUrl,
+}: {
+  whatsappUrl: string;
+  messengerUrl: string;
+}) {
   return (
     <nav
       aria-label="Contact us"
       className="fixed right-4 bottom-4 z-40 flex flex-col items-end gap-3 sm:right-6 sm:bottom-6"
     >
       <a
-        href={siteConfig.messengerUrl}
+        href={messengerUrl}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on Messenger"
@@ -17,7 +22,7 @@ export function FloatingContactButtons() {
         <MessageCircle className="h-6 w-6" />
       </a>
       <a
-        href={siteConfig.whatsappUrl}
+        href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"

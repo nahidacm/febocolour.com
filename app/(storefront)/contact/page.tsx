@@ -1,6 +1,6 @@
 import { Mail, MessageCircle, Phone } from "lucide-react";
 import { StaticPageLayout } from "@/components/storefront/StaticPageLayout";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteContactInfo } from "@/lib/services/settings";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = pageMetadata({
@@ -9,7 +9,11 @@ export const metadata = pageMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+export const revalidate = 300;
+
+export default async function ContactPage() {
+  const contact = await getSiteContactInfo();
+
   return (
     <StaticPageLayout title="Contact Us">
       <p>
@@ -19,7 +23,7 @@ export default function ContactPage() {
       <ul className="!list-none space-y-3 !pl-0">
         <li>
           <a
-            href={siteConfig.whatsappUrl}
+            href={contact.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 font-medium text-brand-700 hover:text-brand-800"
@@ -29,7 +33,7 @@ export default function ContactPage() {
         </li>
         <li>
           <a
-            href={siteConfig.messengerUrl}
+            href={contact.messengerUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 font-medium text-brand-700 hover:text-brand-800"
@@ -38,8 +42,8 @@ export default function ContactPage() {
           </a>
         </li>
         <li>
-          <a href={`tel:${siteConfig.phone}`} className="flex items-center gap-2 font-medium text-brand-700 hover:text-brand-800">
-            <Phone className="h-4 w-4" /> {siteConfig.phone}
+          <a href={`tel:${contact.phone}`} className="flex items-center gap-2 font-medium text-brand-700 hover:text-brand-800">
+            <Phone className="h-4 w-4" /> {contact.phone}
           </a>
         </li>
         <li>

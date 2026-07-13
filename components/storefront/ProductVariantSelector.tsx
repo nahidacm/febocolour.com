@@ -3,7 +3,6 @@
 import { useMemo, useState, useTransition } from "react";
 import { Minus, Plus, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { siteConfig } from "@/lib/site-config";
 import { useCart } from "@/components/storefront/CartProvider";
 import { addToCartAction } from "@/lib/actions/cart";
 
@@ -36,6 +35,8 @@ export function ProductVariantSelector({
   baseSalePrice,
   baseSku,
   baseStockStatus,
+  whatsappUrl,
+  messengerUrl,
 }: {
   productId: number;
   productName: string;
@@ -45,6 +46,8 @@ export function ProductVariantSelector({
   baseSalePrice?: number;
   baseSku: string;
   baseStockStatus: "in_stock" | "out_of_stock" | "backorder";
+  whatsappUrl: string;
+  messengerUrl: string;
 }) {
   const [selected, setSelected] = useState<Record<number, number>>({});
   const [quantity, setQuantity] = useState(1);
@@ -92,7 +95,7 @@ export function ProductVariantSelector({
   const orderMessage = `Hi FeboColour, I'm interested in "${productName}"${
     variantLabel ? ` (${variantLabel})` : ""
   }${sku ? ` — SKU: ${sku}` : ""}.`;
-  const whatsappHref = `${siteConfig.whatsappUrl}?text=${encodeURIComponent(orderMessage)}`;
+  const whatsappHref = `${whatsappUrl}?text=${encodeURIComponent(orderMessage)}`;
 
   function handleAddToCart() {
     setAddStatus("idle");
@@ -227,7 +230,7 @@ export function ProductVariantSelector({
           Order via WhatsApp
         </a>
         <a
-          href={siteConfig.messengerUrl}
+          href={messengerUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex flex-1 items-center justify-center gap-2 rounded-brand-lg border border-brand-200 bg-white px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-brand-50"

@@ -22,5 +22,9 @@ export async function saveSettingsAction(
   await writeAuditLog({ adminUserId: admin.id, action: "update", entityType: "settings" });
 
   revalidatePath("/admin/settings");
+  // Phone/WhatsApp/Messenger render in the storefront's shared layout (Header, Footer,
+  // FloatingContactButtons) and the root layout's JSON-LD — busting just "/" wouldn't
+  // touch the ISR-cached category/product pages that also render that layout.
+  revalidatePath("/", "layout");
   return { success: true };
 }

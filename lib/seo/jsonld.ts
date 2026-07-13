@@ -2,7 +2,7 @@ import { siteConfig } from "@/lib/site-config";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-export function organizationJsonLd() {
+export function organizationJsonLd(phone: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -12,7 +12,7 @@ export function organizationJsonLd() {
     sameAs: [siteConfig.social.facebook, siteConfig.social.instagram, siteConfig.social.youtube],
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: siteConfig.phone,
+      telephone: phone,
       contactType: "customer service",
     },
   };

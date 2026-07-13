@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationJsonLd } from "@/lib/seo/jsonld";
+import { getSiteContactInfo } from "@/lib/services/settings";
 import "./globals.css";
 
 const bodyFont = Inter({
@@ -38,18 +39,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contact = await getSiteContactInfo();
+
   return (
     <html
       lang="en"
       className={`${bodyFont.variable} ${headingFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-foreground">
-        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={organizationJsonLd(contact.phone)} />
         {children}
       </body>
     </html>

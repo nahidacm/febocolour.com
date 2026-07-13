@@ -11,7 +11,7 @@ const policyLinks = [
   { href: "/return-policy", label: "Return Policy" },
 ];
 
-export function Footer() {
+export function Footer({ phone }: { phone: string }) {
   const year = new Date().getFullYear();
 
   return (
@@ -69,11 +69,11 @@ export function Footer() {
             <ul className="mt-4 space-y-3">
               <li>
                 <a
-                  href={`tel:${siteConfig.phone}`}
+                  href={`tel:${phone}`}
                   className="flex items-center gap-2 text-sm text-foreground/70 hover:text-brand-700"
                 >
                   <Phone className="h-4 w-4 shrink-0" />
-                  {siteConfig.phone}
+                  {phone}
                 </a>
               </li>
               <li>

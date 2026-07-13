@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/seo/jsonld";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { getProductBySlug } from "@/lib/services/catalog";
+import { getSiteContactInfo } from "@/lib/services/settings";
 
 export const revalidate = 300;
 
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, contact] = await Promise.all([getProductBySlug(slug), getSiteContactInfo()]);
   if (!product) notFound();
 
   // Attribute values are global (shared across products), but only a subset applies to
@@ -187,6 +188,8 @@ export default async function ProductPage({ params }: PageProps) {
                 baseSalePrice={onSale && product.salePrice ? Number(product.salePrice) : undefined}
                 baseSku={product.sku}
                 baseStockStatus={product.stockStatus}
+                whatsappUrl={contact.whatsappUrl}
+                messengerUrl={contact.messengerUrl}
               />
             </div>
 
