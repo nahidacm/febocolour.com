@@ -14,6 +14,7 @@ export type CartItem = {
   lineTotal: number;
   stockStatus: "in_stock" | "out_of_stock" | "backorder";
   stockAvailable: number;
+  image: string | null;
 };
 
 type CartState = {

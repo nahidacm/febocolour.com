@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useTransition } from "react";
 import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -66,7 +67,19 @@ export function CartMenu() {
                 <ul className={cn("max-h-80 space-y-3 overflow-y-auto", isPending && "opacity-60")}>
                   {items.map((item) => (
                     <li key={item.id} className="flex gap-3">
-                      <PlaceholderImage className="h-16 w-16 shrink-0 rounded-brand-sm" />
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-brand-sm">
+                        {item.image ? (
+                          <Image
+                            src={`/uploads/${item.image}`}
+                            alt={item.productName}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <PlaceholderImage className="h-full w-full" />
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground/90">
                           {item.productName}

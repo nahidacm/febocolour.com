@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { cartItems, carts, productVariants, products } from "@/lib/db/schema";
+import { cartItems, carts, productImages, productVariants, products } from "@/lib/db/schema";
 
 export type CartLineItem = {
   id: number;
@@ -15,6 +15,7 @@ export type CartLineItem = {
   lineTotal: number;
   stockStatus: "in_stock" | "out_of_stock" | "backorder";
   stockAvailable: number;
+  image: string | null;
 };
 
 export type CartSummary = {
@@ -60,7 +61,7 @@ export async function getCartSummary(tokenHash: string | undefined): Promise<Car
     where: eq(cartItems.cartId, cartId),
     orderBy: (item, { asc }) => asc(item.createdAt),
     with: {
-      product: true,
+      product: { with: { images: { where: eq(productImages.isPrimary, true), limit: 1 } } },
       variant: { with: { variantValues: { with: { attributeValue: true } } } },
     },
   });
@@ -86,6 +87,7 @@ export async function getCartSummary(tokenHash: string | undefined): Promise<Car
       lineTotal: unitPrice * row.quantity,
       stockStatus: row.variant?.stockStatus ?? row.product.stockStatus,
       stockAvailable: row.variant?.stockQuantity ?? row.product.stockQuantity,
+      image: row.product.images[0]?.storageKey ?? null,
     };
   });
 

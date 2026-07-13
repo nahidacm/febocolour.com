@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/storefront/Breadcrumbs";
 import { PlaceholderImage } from "@/components/storefront/PlaceholderImage";
@@ -113,11 +114,32 @@ export default async function ProductPage({ params }: PageProps) {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
-            <PlaceholderImage className="aspect-square w-full rounded-brand-xl" iconClassName="h-12 w-12" />
+            <div className="relative aspect-square w-full overflow-hidden rounded-brand-xl">
+              {product.images[0] ? (
+                <Image
+                  src={`/uploads/${product.images[0].storageKey}`}
+                  alt={product.name}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              ) : (
+                <PlaceholderImage className="h-full w-full" iconClassName="h-12 w-12" />
+              )}
+            </div>
             {imageCount > 1 ? (
               <div className="mt-3 grid grid-cols-4 gap-3">
-                {Array.from({ length: imageCount - 1 }).map((_, i) => (
-                  <PlaceholderImage key={i} className="aspect-square w-full rounded-brand-md" />
+                {product.images.slice(1).map((image) => (
+                  <div key={image.id} className="relative aspect-square w-full overflow-hidden rounded-brand-md">
+                    <Image
+                      src={`/uploads/${image.storageKey}`}
+                      alt={product.name}
+                      fill
+                      sizes="150px"
+                      className="object-cover"
+                    />
+                  </div>
                 ))}
               </div>
             ) : null}

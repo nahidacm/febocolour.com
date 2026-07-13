@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, ilike, isNull, or } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { categories, homepageBanners, products } from "@/lib/db/schema";
+import { categories, homepageBanners, productImages, products } from "@/lib/db/schema";
 
 export type ProductBadge = "Sale" | "Best Seller" | "Featured" | "New";
 
@@ -11,7 +11,13 @@ export type ProductListItem = {
   salePrice?: number;
   badge?: ProductBadge;
   stockStatus: "in_stock" | "out_of_stock" | "backorder";
+  image: string | null;
 };
+
+/** Every product-listing query joins its primary image the same way. */
+const primaryImage = {
+  images: { where: eq(productImages.isPrimary, true), limit: 1 },
+} as const;
 
 function isOnSale(product: {
   salePrice: string | null;
@@ -48,6 +54,7 @@ export function toListItem(product: {
   isBestSeller: boolean;
   isFeatured: boolean;
   stockStatus: "in_stock" | "out_of_stock" | "backorder";
+  images?: { storageKey: string }[];
 }): ProductListItem {
   return {
     slug: product.slug,
@@ -56,6 +63,7 @@ export function toListItem(product: {
     salePrice: isOnSale(product) ? Number(product.salePrice) : undefined,
     badge: computeBadge(product),
     stockStatus: product.stockStatus,
+    image: product.images?.[0]?.storageKey ?? null,
   };
 }
 
@@ -83,16 +91,19 @@ export async function getHomepageData() {
       where: and(activeProduct, eq(products.isBestSeller, true)),
       orderBy: desc(products.createdAt),
       limit: 8,
+      with: primaryImage,
     }),
     db.query.products.findMany({
       where: activeProduct,
       orderBy: desc(products.createdAt),
       limit: 8,
+      with: primaryImage,
     }),
     db.query.products.findMany({
       where: and(activeProduct, eq(products.isFeatured, true)),
       orderBy: desc(products.createdAt),
       limit: 8,
+      with: primaryImage,
     }),
   ]);
 
@@ -123,6 +134,7 @@ export async function getProductsForCategory(categoryId: number, childIds: numbe
       or(...categoryIds.map((id) => eq(products.categoryId, id))),
     ),
     orderBy: desc(products.createdAt),
+    with: primaryImage,
   });
   return rows.map(toListItem);
 }
@@ -165,6 +177,7 @@ export async function browseProducts({
     where: and(...conditions),
     orderBy: desc(products.createdAt),
     limit: 48,
+    with: primaryImage,
   });
 
   const badgeOverride = filter === "new" ? ("New" as const) : undefined;

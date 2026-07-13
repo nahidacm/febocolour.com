@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PlaceholderImage } from "@/components/storefront/PlaceholderImage";
 import type { ProductListItem } from "@/lib/services/catalog";
 
@@ -19,8 +20,18 @@ export function ProductCard({
       href={`/product/${product.slug}`}
       className="group block w-full shrink-0 sm:w-auto"
     >
-      <div className="relative">
-        <PlaceholderImage className="aspect-3/4 w-full rounded-brand-lg transition-transform group-hover:scale-[1.02]" />
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-brand-lg">
+        {product.image ? (
+          <Image
+            src={`/uploads/${product.image}`}
+            alt={product.name}
+            fill
+            sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+            className="object-cover transition-transform group-hover:scale-[1.02]"
+          />
+        ) : (
+          <PlaceholderImage className="h-full w-full transition-transform group-hover:scale-[1.02]" />
+        )}
         {product.badge ? (
           <span className="absolute top-3 left-3 rounded-full bg-brand-600 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-white uppercase">
             {product.badge}

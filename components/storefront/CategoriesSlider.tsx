@@ -1,11 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SectionHeading } from "@/components/storefront/SectionHeading";
 import { PlaceholderImage } from "@/components/storefront/PlaceholderImage";
 
 export function CategoriesSlider({
   categories,
 }: {
-  categories: { slug: string; name: string }[];
+  categories: { slug: string; name: string; image: string | null }[];
 }) {
   if (categories.length === 0) return null;
 
@@ -19,7 +20,19 @@ export function CategoriesSlider({
             href={`/category/${category.slug}`}
             className="group flex w-36 shrink-0 snap-start flex-col items-center gap-3 sm:w-44"
           >
-            <PlaceholderImage className="aspect-square w-full rounded-full transition-transform group-hover:scale-105" />
+            <div className="relative aspect-square w-full overflow-hidden rounded-full">
+              {category.image ? (
+                <Image
+                  src={`/uploads/${category.image}`}
+                  alt={category.name}
+                  fill
+                  sizes="176px"
+                  className="object-cover transition-transform group-hover:scale-105"
+                />
+              ) : (
+                <PlaceholderImage className="h-full w-full transition-transform group-hover:scale-105" />
+              )}
+            </div>
             <span className="text-sm font-medium text-foreground/80 group-hover:text-brand-700">
               {category.name}
             </span>

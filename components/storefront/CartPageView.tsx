@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useTransition } from "react";
 import { Minus, Plus, Truck, X } from "lucide-react";
 import { useCart } from "@/components/storefront/CartProvider";
@@ -72,8 +73,18 @@ export function CartPageView({
               key={item.id}
               className="flex gap-4 rounded-brand-lg border border-brand-100 bg-white p-4"
             >
-              <Link href={`/product/${item.productSlug}`} className="shrink-0">
-                <PlaceholderImage className="h-24 w-24 rounded-brand-md" />
+              <Link href={`/product/${item.productSlug}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-brand-md">
+                {item.image ? (
+                  <Image
+                    src={`/uploads/${item.image}`}
+                    alt={item.productName}
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <PlaceholderImage className="h-full w-full" />
+                )}
               </Link>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
