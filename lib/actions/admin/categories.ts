@@ -11,6 +11,7 @@ import {
   getCategoryForAdmin,
   updateCategory,
 } from "@/lib/services/admin/categories";
+import { deleteFile, saveFile } from "@/lib/storage/local";
 
 export type CategoryFormState = { error?: string; fieldErrors?: Record<string, string> };
 
@@ -46,9 +47,15 @@ export async function saveCategoryAction(
     return { error: "Please fix the errors below.", fieldErrors };
   }
 
+  const imageFile = formData.get("image");
+  const hasNewImage = imageFile instanceof File && imageFile.size > 0;
+  const imageKey = hasNewImage ? await saveFile(imageFile as File, "categories") : undefined;
+
   try {
     if (id) {
-      const category = await updateCategory(id, parsed.data);
+      const previous = await getCategoryForAdmin(id);
+      const category = await updateCategory(id, parsed.data, imageKey);
+      if (imageKey && previous?.image) await deleteFile(previous.image);
       await writeAuditLog({
         adminUserId: admin.id,
         action: "update",
@@ -61,7 +68,7 @@ export async function saveCategoryAction(
       return {};
     }
 
-    const category = await createCategory(parsed.data);
+    const category = await createCategory(parsed.data, imageKey);
     await writeAuditLog({
       adminUserId: admin.id,
       action: "create",
@@ -84,6 +91,7 @@ export async function deleteCategoryAction(id: number) {
   const admin = await requireAdmin();
   const category = await getCategoryForAdmin(id);
   await deleteCategory(id);
+  if (category?.image) await deleteFile(category.image);
   await writeAuditLog({
     adminUserId: admin.id,
     action: "delete",

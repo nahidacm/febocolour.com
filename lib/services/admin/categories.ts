@@ -38,15 +38,18 @@ function toCategoryRow(input: CategoryInput) {
   };
 }
 
-export async function createCategory(input: CategoryInput) {
-  const [category] = await db.insert(categories).values(toCategoryRow(input)).returning();
+export async function createCategory(input: CategoryInput, imageKey?: string) {
+  const [category] = await db
+    .insert(categories)
+    .values({ ...toCategoryRow(input), image: imageKey ?? null })
+    .returning();
   return category;
 }
 
-export async function updateCategory(id: number, input: CategoryInput) {
+export async function updateCategory(id: number, input: CategoryInput, imageKey?: string) {
   const [category] = await db
     .update(categories)
-    .set({ ...toCategoryRow(input), updatedAt: new Date() })
+    .set({ ...toCategoryRow(input), ...(imageKey ? { image: imageKey } : {}), updatedAt: new Date() })
     .where(eq(categories.id, id))
     .returning();
   return category;
